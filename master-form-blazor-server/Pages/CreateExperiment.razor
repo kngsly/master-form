@@ -1,0 +1,87 @@
+﻿@page "/admin/experiment/create"
+@page "/admin/experiment/edit/{slug}"
+
+
+@using master_form_blazor_server.Data;
+@inject ExperimentService InjectedExperimentService;
+@inject NotificationService NotificationService
+
+@{
+    bool Editing = !string.IsNullOrEmpty(slug);
+}
+
+@if (AuthContext.IsAnAdmin)
+{
+    <PageTitle>@(Editing ? "Editing experiment" : "Creating experiment")</PageTitle>
+    <h1 class="mb-4">@(Editing ? "Editing experiment" : "Creating experiment")</h1>
+
+    @if (experiment != null)
+    {
+        <RadzenCard>
+            <label class="small fw-bold mb-1">URL <span class="">(required)</span></label>
+            <RadzenTextBox Placeholder="Unique link for sharing this experiment publicly" @bind-Value=@experiment.Slug Class="w-100 mb-3" />
+
+            <label class="small fw-bold mb-1">Title</label>
+            <RadzenTextBox Placeholder="" @bind-Value=@experiment.Title Class="w-100 mb-3" />
+
+            <label class="small fw-bold mb-1">Description</label>
+            <RadzenTextArea Placeholder="" @bind-Value=@experiment.Description Class="w-100 mb-3" />
+
+            @if (!Editing)
+            {
+                // Allow to delete or disable experiment
+            }
+
+            <RadzenButton ButtonStyle=ButtonStyle.Success
+                  Text=@(Editing ? "Save & update experiment" : "Create experiment")
+                  Click=Submit />
+        </RadzenCard>
+    }
+}
+else
+{
+    <PageTitle>You must be admin.</PageTitle>
+    <p><em>You must be admin to experiment.</em></p>
+}
+
+@code {
+    [Parameter]
+    public string? slug { get; set; }
+
+    public bool loaded = false;
+    private Data.Experiment? experiment;
+
+    async void Submit()
+    {
+        if (experiment != null)
+        {
+            var Response = await InjectedExperimentService.WriteExperimentToFile(experiment);
+
+            NotificationService.Notify(
+                new NotificationMessage { Severity = Response.Ok ? NotificationSeverity.Success : NotificationSeverity.Error, Summary = "Experiment submission", Detail = Response.Message ?? "Unknown error", Duration = 5000 }
+            );
+
+            if (Response.Ok)
+            {
+                await Task.Delay(500); // Simulate delay/give time to read dialog
+                NavManager.NavigateTo($"/experiment/{experiment.Slug}");
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(slug))
+        {
+            experiment = await InjectedExperimentService.GetExperiment(slug);
+        }
+
+        if (experiment == null)
+        {
+            experiment = new Data.Experiment();
+        }
+
+        loaded = true;
+        StateHasChanged();
+    }
+}
