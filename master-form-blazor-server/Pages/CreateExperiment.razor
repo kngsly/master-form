@@ -18,14 +18,17 @@
     @if (experiment != null)
     {
         <RadzenCard>
+            <label class="small fw-bold mb-1">Enabled</label>
+            <RadzenSwitch @bind-Value=@experiment.Enabled class="mb-3" />
+
             <label class="small fw-bold mb-1">URL <span class="">(required)</span></label>
-            <RadzenTextBox Placeholder="Unique link for sharing this experiment publicly" @bind-Value=@experiment.Slug Class="w-100 mb-3" />
+            <RadzenTextBox Placeholder="Unique link for sharing this experiment publicly" @bind-Value=@experiment.Slug class="w-100 mb-3" />
 
             <label class="small fw-bold mb-1">Title</label>
-            <RadzenTextBox Placeholder="" @bind-Value=@experiment.Title Class="w-100 mb-3" />
+            <RadzenTextBox Placeholder="" @bind-Value=@experiment.Title class="w-100 mb-3" />
 
             <label class="small fw-bold mb-1">Description</label>
-            <RadzenTextArea Placeholder="" @bind-Value=@experiment.Description Class="w-100 mb-3" />
+            <RadzenTextArea Placeholder="" @bind-Value=@experiment.Description class="w-100 mb-3" />
 
             @if (!Editing)
             {
@@ -55,7 +58,7 @@ else
     {
         if (experiment != null)
         {
-            var Response = await InjectedExperimentService.WriteExperimentToFile(experiment);
+            var Response = await InjectedExperimentService.WriteExperimentToFile(experiment, slug);
 
             NotificationService.Notify(
                 new NotificationMessage { Severity = Response.Ok ? NotificationSeverity.Success : NotificationSeverity.Error, Summary = "Experiment submission", Detail = Response.Message ?? "Unknown error", Duration = 5000 }
