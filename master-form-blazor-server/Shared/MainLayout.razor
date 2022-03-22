@@ -1,0 +1,44 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>master-form-blazor-server</PageTitle>
+
+<CascadingValue Value="this">
+    <div class="page">
+        <div class="sidebar">
+            @if (RenderPage)
+            {
+                <NavMenu />
+            }
+        </div>
+
+        <main>
+            @if (RenderPage)
+            {
+                <article class="content px-4">
+                    @Body
+                </article>
+            }
+            else
+            {
+                <div class="container text-center">
+                    <div class="py-5"><em>Loading...</em></div>
+                </div>
+            }
+        </main>
+    </div>
+</CascadingValue>
+
+@code {
+    public bool RenderPage = true;
+
+    public async void Rerender()
+    {
+        RenderPage = false;
+        StateHasChanged();
+
+        await Task.Delay(250);
+
+        RenderPage = true;
+        StateHasChanged();
+    }
+}

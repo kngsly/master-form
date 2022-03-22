@@ -1,0 +1,49 @@
+﻿@page "/experiment/{slug}"
+
+<PageTitle>Experiment</PageTitle>
+
+@using master_form_blazor_server.Data;
+@inject ExperimentService InjectedExperimentService;
+
+@if (loaded == false)
+{
+    <p><em>Loading...</em></p>
+}
+else if (experiment == null)
+{
+    
+    <p>Experiment not found, sorry about that.</p>
+}
+else
+{
+    <div class="container">
+        <div class="pt-5 pb-3">
+            <h1>@(experiment.Title ?? experiment.Slug)</h1>
+            @if(!string.IsNullOrEmpty(experiment.Description))
+            {
+                <p style="white-space: pre-line;">@experiment.Description</p>
+            }
+        </div>
+        <div>
+            @{
+                // Load inputs...
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string slug {get;set;}
+
+    private bool loaded;
+    private Data.Experiment? experiment;
+
+    protected override async Task OnInitializedAsync()
+    {
+        experiment = await InjectedExperimentService.GetExperiment(slug);
+
+        loaded = true;
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,31 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<div class="mb-4">
+    <h1>Welcome to Master Form</h1>
+    <h5>Create, share and fill out forms.</h5>
+</div>
+
+<div class="alert alert-info">You are currently <b>@(AuthContext.IsAnAdmin ? "an admin" : "a guest")</b>, you can toggle between these roles by clicking the button below.</div>
+
+<button class="btn btn-primary" @onclick=@(() => { 
+    AuthContext.IsAnAdmin = !AuthContext.IsAnAdmin; 
+    Layout.Rerender(); // Update view from MainLayout (highest level parent)
+})>
+    @if (AuthContext.IsAnAdmin)
+    {
+        <span><span class="oi oi-key" aria-hidden="true"></span> Downgrade to guest</span>
+    }
+    else
+    {
+        <span><span class="oi oi-key text-warning" aria-hidden="true"></span> Upgrade to admin</span>
+    }
+</button>
+
+@code {
+    [CascadingParameter]
+    public MainLayout Layout { get; set; }
+
+
+}
