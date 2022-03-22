@@ -5,6 +5,6 @@ namespace master_form_blazor_server.Data
 {
     public class AuthenticationContext
     {
-        public bool IsAnAdmin { get; set; }
+        public bool IsAnAdmin { get; set; } = true;
     }
 }
