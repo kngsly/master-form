@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Folder Include="Storage\Experiments\" />
+    <Folder Include="Storage\Responses\" />
   </ItemGroup>
 
 </Project>
