@@ -1,0 +1,45 @@
+﻿<div class="small fw-bold mb-1">@input.Label</div>
+@if (input.InputType == Data.InputType.Text)
+{
+    <RadzenTextBox Placeholder=@input.Hint Value=@input.Value Change=@ValueChanged class="w-100 mb-3" />
+}
+else if (input.InputType == Data.InputType.TextMulti)
+{
+    <RadzenTextArea Rows="4" Placeholder=@input.Hint Value=@input.Value Change=@ValueChanged class="w-100 mb-3" />
+}
+else if (input.InputType == Data.InputType.Password)
+{
+    <RadzenPassword Value=@input.Value Change=@ValueChanged Placeholder=@(!string.IsNullOrEmpty(input.Hint) ? input.Hint : "Password") class="w-100 mb-3" />
+}
+else if (input.InputType == Data.InputType.Email)
+{
+    <RadzenTextBox type="email" inputmode="email" Value=@input.Value Change=@ValueChanged Placeholder=@(!string.IsNullOrEmpty(input.Hint) ? input.Hint : "john@email.com") class="w-100 mb-3" />
+}
+else if (input.InputType == Data.InputType.Phone)
+{
+    <RadzenTextBox type="tel" inputmode="tel" Value=@input.Value Change=@ValueChanged Placeholder=@(!string.IsNullOrEmpty(input.Hint) ? input.Hint : "0400 345 678") class="w-100 mb-3" />
+}
+else if (input.InputType == Data.InputType.Dropdown)
+{
+    <RadzenDropDown AllowClear="false" TValue="string" Value=@input.Value Change=@((v) => ValueChanged((string)v)) Data=@input.Options class="w-100 mb-3" />
+}
+else
+{
+    <div class="mb-3 text-danger">@input.InputType is not supported.</div>
+}
+
+@code {
+    [Parameter]
+    public Data.ExperimentFormInput input { get; set; }
+
+    [Parameter]
+    public EventCallback<string> Onchange { get; set; }
+
+    void ValueChanged(string val)
+    {
+        if (Onchange.HasDelegate)
+        {
+            Onchange.InvokeAsync(val);
+        }
+    }
+}
