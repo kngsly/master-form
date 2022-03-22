@@ -31,7 +31,7 @@ namespace master_form_blazor_server.Data
 
             return new Result()
             {
-                Ok = _returnErrors != null,
+                Ok = string.IsNullOrEmpty(_returnErrors),
                 Message = _returnErrors ?? ""
             };
         }
