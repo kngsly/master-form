@@ -1,0 +1,73 @@
+﻿@page "/experiments"
+@using System;
+@using System.IO;
+@using System.Collections;
+@inject Data.ExperimentService InjectedExperimentService;
+
+<PageTitle>Experiments</PageTitle>
+
+<div class="mb-4">
+    <h1>Experiments</h1>
+</div>
+
+@if (Loaded)
+{
+    if (FilteredExperiments != null && FilteredExperiments.Any())
+    {
+        foreach(var Experiment in FilteredExperiments)
+        {
+            <RadzenCard class="mb-3" @onclick=@(() => {
+                NavManager.NavigateTo($"experiment/{Experiment.Slug}");
+            }) style="cursor: pointer;">
+                <h3 class="h5">@(string.IsNullOrEmpty(Experiment.Title) ? Experiment.Slug : Experiment.Title)</h3>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div>Status</div>
+                        <b>@(Experiment.Enabled ? "Enabled" : "Disabled")</b>
+                    </div>
+                    <div class="col-md-8">
+                        <div>Created</div>
+                        <b>@Experiment.Created.ToLocalTime()</b>
+                    </div>
+                </div>
+            </RadzenCard>
+        }
+    }
+    else
+    {
+        <p><em>No experiments currently available.</em></p>
+
+    }
+}
+else
+{
+    <p><em>Loading...</em></p>
+}
+
+@code {
+    [CascadingParameter]
+    public MainLayout Layout { get; set; }
+
+    private List<Data.Experiment> FilteredExperiments;
+    public bool Loaded = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        FilteredExperiments = new List<Data.Experiment>();
+
+        string[] FileNames = Directory.GetFiles("Storage/Experiments");
+        foreach (string FileName in FileNames)
+        {
+            var Stripped = FileName.Split("\\").Last().Split(".").First(); // -> [property-report].json
+            var Experiment = await InjectedExperimentService.GetExperiment(Stripped, AuthContext.IsAnAdmin);
+
+            if (Experiment != null)
+            {
+                FilteredExperiments.Add(Experiment); // Found experiment, add to lis
+            }
+        }
+
+        Loaded = true;
+        StateHasChanged();
+    }
+}
