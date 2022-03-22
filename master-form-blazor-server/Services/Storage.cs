@@ -6,6 +6,11 @@ namespace master_form_blazor_server.Data
     // The following code snippet is from: https://stackoverflow.com/a/22417240/17305173
     public class Storage 
     {
+        public static string AppendSlugDirectory(string slug)
+        {
+            return $"Storage/Experiments/{slug}.json";
+        }
+
         /// <summary>
         /// Writes the given object instance to a Json file.
         /// <para>Object type must have a parameterless constructor.</para>
@@ -59,6 +64,14 @@ namespace master_form_blazor_server.Data
             {
                 if (reader != null)
                     reader.Close();
+            }
+        }
+
+        public static void RemoveFile(string filePath)
+        {
+            if(File.Exists(filePath))
+            {
+                File.Delete(filePath);
             }
         }
     }
