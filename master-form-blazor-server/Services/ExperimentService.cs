@@ -5,13 +5,15 @@ namespace master_form_blazor_server.Data
 {
     public class Experiment
     {
-        public string? Title { get; set; }
-        public string? Description { get; set; }
-        [Required]
-        [MaxLength(100)]
+        public string Title { get; set; } = "";
+        public string Description { get; set; } = "";
+        private string slug; // used to hold and modify slug regex
+        [Required(ErrorMessage = "URL is required.")]
+        [MinLength(1, ErrorMessage = "URL must be atleast 1 character.")]
+        [MaxLength(200, ErrorMessage = "URL must be less than 200 characters.")]
         public string Slug { 
-            get { return Slug; } 
-            set { Slug = new Regex("[^a-zA-Z0-9-]").Replace(value ?? "", ""); } 
+            get { return this.slug; } 
+            set { this.slug = (new Regex("[^a-zA-Z0-9-]").Replace(value ?? "", "-")).TrimEnd('-'); } 
         } // Used as a unique reference (url supported)
         public bool Enabled { get; set; } // Allow experiment to be viewed/submitted
         public DateTime Created { get; set; }
@@ -34,6 +36,10 @@ namespace master_form_blazor_server.Data
             var validateInputs = Validation.GetValdationErrors(experiment); // Validate inputs
             if (validateInputs.Ok.Equals(false)) // Validation failed
                 return validateInputs; // Return <Result> error
+
+            if(experiment.Created == default) 
+                experiment.Created = DateTime.Now; // Add initial creation date
+            experiment.Updated = DateTime.Now;
 
             // Check if this slug is unique
             // In production, this will utilize some form of centralize database storage
