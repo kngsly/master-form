@@ -16,9 +16,16 @@ else if (experiment == null)
 }
 else
 {
-    <div class="container">
+    @if(AuthContext.IsAnAdmin)
+    {
+        <RadzenCard>
+            <h3 class="h5">Hey Admin, you can manage this page!</h3>
+            <RadzenButton ButtonStyle=ButtonStyle.Primary Click=@(() => NavManager.NavigateTo($"/admin/experiment/edit/{experiment.Slug}")) Text="Edit experiment" />
+        </RadzenCard>
+    }
+
         <div class="pt-5 pb-3">
-            <h1>@(experiment.Title ?? experiment.Slug)</h1>
+            <h1>@(string.IsNullOrEmpty(experiment.Title) ? experiment.Slug : experiment.Title)</h1>
             @if(!string.IsNullOrEmpty(experiment.Description))
             {
                 <p style="white-space: pre-line;">@experiment.Description</p>
@@ -29,7 +36,6 @@ else
                 // Load inputs...
             }
         </div>
-    </div>
 }
 
 @code {
