@@ -11,12 +11,12 @@
 }
 else if (experiment == null)
 {
-    
+
     <p>Experiment not found, sorry about that.</p>
 }
 else
 {
-    @if(AuthContext.IsAnAdmin)
+    @if (AuthContext.IsAnAdmin)
     {
         <RadzenCard>
             <h3 class="h5">Hey Admin, you can manage this page!</h3>
@@ -24,30 +24,62 @@ else
         </RadzenCard>
     }
 
-        <div class="pt-5 pb-3">
-            <h1>@(string.IsNullOrEmpty(experiment.Title) ? experiment.Slug : experiment.Title)</h1>
-            @if(!string.IsNullOrEmpty(experiment.Description))
+    <div class="pt-5 pb-3">
+        <h1>@(string.IsNullOrEmpty(experiment.Title) ? experiment.Slug : experiment.Title)</h1>
+        @if (!string.IsNullOrEmpty(experiment.Description))
+        {
+            <p style="white-space: pre-line;">@experiment.Description</p>
+        }
+    </div>
+    <RadzenCard class="mt-5" Style="max-width: 680px;">
+        @if (experiment.Inputs.Any())
+        {
+            foreach (var input in experiment.Inputs)
             {
-                <p style="white-space: pre-line;">@experiment.Description</p>
+                        // Load inputs...
+                <master_form_blazor_server.Shared.Components.ExperimentInput input=@(input) Onchange=@((str) => input.Value = str ) />
             }
-        </div>
-        <div>
-            @{
-                // Load inputs...
-            }
-        </div>
+        }
+
+        <RadzenButton IsBusy=@busy ButtonStyle=ButtonStyle.Secondary Click=@Submit Icon="save" Text="Complete form" />
+    </RadzenCard>
 }
 
 @code {
     [Parameter]
-    public string slug {get;set;}
+    public string slug { get; set; }
 
-    private bool loaded;
+    private bool responded; // after someone has responded
+    private bool busy; // busy loading indicator (ux)
+    private bool loaded; // did we already load this experiment
     private Data.Experiment? experiment;
+
+    async void Submit()
+    {
+        busy = true;
+        StateHasChanged();
+
+        // Do some stuff...
+
+
+        await Task.Delay(500);
+
+        // result...
+
+        // Stop busying
+        busy = false;
+        StateHasChanged();
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        experiment = await InjectedExperimentService.GetExperiment(slug);
+        experiment = await InjectedExperimentService.GetExperiment(slug, AuthContext.IsAnAdmin);
+
+        if (experiment != null) // Experiment found
+        {
+            // Add default inputs to start of form
+            experiment.Inputs.InsertRange(0, ExperimentFormBuilderService.DefaultInputs());
+        }
 
         loaded = true;
         StateHasChanged();
