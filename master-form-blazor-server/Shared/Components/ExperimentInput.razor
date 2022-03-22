@@ -1,25 +1,25 @@
 ﻿<div class="small fw-bold mb-1">@input.Label</div>
-@if (input.InputType == Data.InputType.Text)
+@if (input.InputType == Data.InputType.Text) // Basic text field
 {
     <RadzenTextBox Placeholder=@input.Hint Value=@input.Value Change=@ValueChanged class="w-100 mb-3" />
 }
-else if (input.InputType == Data.InputType.TextMulti)
+else if (input.InputType == Data.InputType.TextMulti) // Multiline text field (4 rows)
 {
     <RadzenTextArea Rows="4" Placeholder=@input.Hint Value=@input.Value Change=@ValueChanged class="w-100 mb-3" />
 }
-else if (input.InputType == Data.InputType.Password)
+else if (input.InputType == Data.InputType.Password) // Password text field
 {
     <RadzenPassword Value=@input.Value Change=@ValueChanged Placeholder=@(!string.IsNullOrEmpty(input.Hint) ? input.Hint : "Password") class="w-100 mb-3" />
 }
-else if (input.InputType == Data.InputType.Email)
+else if (input.InputType == Data.InputType.Email) // Email text field
 {
     <RadzenTextBox type="email" inputmode="email" Value=@input.Value Change=@ValueChanged Placeholder=@(!string.IsNullOrEmpty(input.Hint) ? input.Hint : "john@email.com") class="w-100 mb-3" />
 }
-else if (input.InputType == Data.InputType.Phone)
+else if (input.InputType == Data.InputType.Phone) // Phone text field
 {
     <RadzenTextBox type="tel" inputmode="tel" Value=@input.Value Change=@ValueChanged Placeholder=@(!string.IsNullOrEmpty(input.Hint) ? input.Hint : "0400 345 678") class="w-100 mb-3" />
 }
-else if (input.InputType == Data.InputType.Dropdown)
+else if (input.InputType == Data.InputType.Dropdown) // Dropdown input
 {
     <RadzenDropDown AllowClear="false" TValue="string" Value=@input.Value Change=@((v) => ValueChanged((string)v)) Data=@input.Options class="w-100 mb-3" />
 }
@@ -35,7 +35,7 @@ else
     [Parameter]
     public EventCallback<string> Onchange { get; set; }
 
-    void ValueChanged(string val)
+    void ValueChanged(string val) // Tell the parent the value changed
     {
         if (Onchange.HasDelegate)
         {
