@@ -58,7 +58,9 @@ else
         string[] FileNames = Directory.GetFiles("Storage/Experiments");
         foreach (string FileName in FileNames)
         {
-            var Stripped = FileName.Split("\\").Last().Split(".").First(); // -> [property-report].json
+            // Windows & Linux like to alternate between using \ and /
+            // Replace all \ with /, get the last string index (file) then read the slug
+            var Stripped = FileName.Replace("\\", "/").Split("/").Last().Split(".").First(); // -> [property-report].json
             var Experiment = await InjectedExperimentService.GetExperiment(Stripped, AuthContext.IsAnAdmin);
 
             if (Experiment != null)
