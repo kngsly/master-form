@@ -24,7 +24,7 @@ namespace master_form_blazor_server.Data
         public List<ExperimentFormInput> Inputs { get; set; } = new List<ExperimentFormInput>();
     }
 
-    public class ExperimentService
+    public partial class ExperimentService
     {
         public async Task<Experiment> GetExperiment(string Slug, bool IsAdmin = false)
         {
