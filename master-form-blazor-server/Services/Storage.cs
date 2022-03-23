@@ -11,6 +11,26 @@ namespace master_form_blazor_server.Data
             return $"Storage/Experiments/{slug}.json";
         }
 
+        public static string AppendResponseDirectory(string slug)
+        {
+            return $"Storage/Responses/{slug}.json";
+        }
+
+        public static FileInfo GetUniquePath(string path)
+        {
+            string Directory = Path.GetDirectoryName(path);
+            string FileName = Path.GetFileNameWithoutExtension(path);
+            string FileExtension = Path.GetExtension(path);
+
+            for (int i = 1; ; ++i)
+            {
+                if (!File.Exists(path))
+                    return new FileInfo(path);
+
+                path = Path.Combine(Directory, FileName + " " + i + FileExtension);
+            }
+        }
+
         /// <summary>
         /// Writes the given object instance to a Json file.
         /// <para>Object type must have a parameterless constructor.</para>

@@ -4,6 +4,7 @@
 
 @using master_form_blazor_server.Data;
 @inject ExperimentService InjectedExperimentService;
+@inject NotificationService NotificationService
 
 @if (loaded == false)
 {
@@ -32,16 +33,34 @@ else
         }
     </div>
     <RadzenCard class="mt-5" Style="max-width: 680px;">
-        @if (experiment.Inputs.Any())
+        @if (responded.Equals(false))
         {
-            foreach (var input in experiment.Inputs)
+
+            @if (experiment.Inputs.Any())
             {
-                        // Load inputs...
-                <master_form_blazor_server.Shared.Components.ExperimentInput input=@(input) Onchange=@((str) => input.Value = str ) />
+                foreach (var input in experiment.Inputs)
+                {
+                    // Load inputs...
+                    <master_form_blazor_server.Shared.Components.ExperimentInput input=@(input) Onchange=@((str) => input.Value = str ) />
+                }
+            }
+
+            @if(experiment.Enabled)
+            {
+                <RadzenButton IsBusy=@busy ButtonStyle=ButtonStyle.Secondary Click=@Submit Icon="save" Text="Complete form" />
+            }
+            else
+            {
+                <div class="alert alert-warning">This experiment is not enabled. If you are an admin click "Edit experiment" and toggle "Enabled" above to make changes.</div>
             }
         }
-
-        <RadzenButton IsBusy=@busy ButtonStyle=ButtonStyle.Secondary Click=@Submit Icon="save" Text="Complete form" />
+        else
+        {
+            <div class="text-center">
+                <h3>Thank you!</h3>
+                <p>Your submission has been received.</p>
+            </div>
+        }
     </RadzenCard>
 }
 
@@ -56,19 +75,24 @@ else
 
     async void Submit()
     {
-        busy = true;
-        StateHasChanged();
+        if (experiment != null)
+        {
+            busy = true;
+            StateHasChanged();
 
-        // Do some stuff...
+            var Response = await InjectedExperimentService.SubmitExperimentForm(slug, experiment.Inputs);
 
+            // Show response
+            NotificationService.Notify(
+                new NotificationMessage { Severity = Response.Ok ? NotificationSeverity.Success : NotificationSeverity.Error, Summary = "Experiment submission", Detail = Response.Message ?? "Unknown error", Duration = 5000 }
+            );
 
-        await Task.Delay(500);
+            responded = Response.Ok; // If response was successful, it will be marked as responded.
 
-        // result...
-
-        // Stop busying
-        busy = false;
-        StateHasChanged();
+            // Stop busy indicator
+            busy = false;
+            StateHasChanged();
+        }
     }
 
     protected override async Task OnInitializedAsync()
