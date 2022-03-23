@@ -8,8 +8,8 @@ namespace master_form_blazor_server.Data
     {
         // Rest API
         [HttpPost]
-        [Route("experiment/submit/{Slug}")]
-        public async Task<IActionResult> MeAsync(string Slug, [FromBody] List<ExperimentFormInput> Inputs)
+        [Route("api/experiment/submit/{Slug}")]
+        public async Task<IActionResult> SubmitExperimentFormIActionResult(string Slug, [FromBody] List<ExperimentFormInput> Inputs)
         {
             var Response = await SubmitExperimentForm(Slug, Inputs);
 
